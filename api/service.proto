@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package parsit_api_spec;
+
+import "google/api/annotations.proto";
+
+option go_package = ".;api";
+
+message Coreference {
+    // Confidence for the coreference
+    double score = 1;
+
+    // The target sentence ID
+    int32 sentenceId = 2;
+
+    // The target token ID
+    int32 tokenId = 3;
+}
+
+message Error {
+    string Message = 1;
+}
+
+message Morphology {
+    // Grammatical case
+    string case = 1;
+
+    // Grammatical gender in the sentence context
+    string ctx_gender = 2;
+
+    // Verbal mood in the sentence context
+    string ctx_mood = 3;
+
+    // Number in the sentence context
+    string ctx_number = 4;
+
+    // Person in the sentence context
+    string ctx_person = 5;
+
+    // Verbal voice in the sentence context
+    string ctx_voice = 6;
+
+    // Degree
+    string degree = 7;
+
+    // Grammatical gender
+    string gender = 8;
+
+    // The lemma
+    string lemma = 9;
+
+    // Verbal mood
+    string mood = 10;
+
+    // Number
+    string number = 11;
+
+    // Person
+    string person = 12;
+
+    // Part-of-speech tag
+    string pos = 13;
+
+    // Verbal tense
+    string tense = 14;
+}
+
+message PostForParsingRequest {
+    // Request to the parsing service
+    Request request = 1;
+}
+
+message Request {
+    // The text to parse
+    string text = 1;
+}
+
+message Response {
+    // List of sentences
+    repeated Sentence sentences = 1;
+}
+
+message Sentence {
+    // The ID of the sentence
+    int32 id = 1;
+
+    // Confidence of overall sentence attachments
+    double score = 2;
+
+    // List of tokens
+    repeated Token tokens = 3;
+}
+
+message Token {
+    // List of tokens
+    repeated Coreference coref = 1;
+
+    // Dependency relation
+    string deprel = 2;
+
+    // Index of the last character of the token in the original text
+    int32 end = 3;
+
+    // Form of the token as in the original text
+    string form = 4;
+
+    // Syntactic head (-1 for the ROOT)
+    int32 head = 5;
+
+    // ID of the token
+    int32 id = 6;
+
+    // List of possible morphological interpretations
+    repeated Morphology morpho = 7;
+
+    // Coarse-grained part-of-speech tag
+    string pos = 8;
+
+    // Index of the token (not the ID)
+    string position = 9;
+
+    // Confidence for the syntactic attachment
+    double score = 10;
+
+    // List of semantic labels
+    repeated string semantic = 11;
+
+    // Index of the first character of the token in the original text
+    int32 start = 12;
+
+    // Token type (one of WORD, WORD_TRACE, TRACE)
+    string type = 13;
+}
+
+service ParsitApiSpecService {
+    // Receives a text in Italian and returns its morpho-syntactic structure
+    rpc PostForParsing(PostForParsingRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/parse"
+            body: "request"
+        };
+    }
+}
